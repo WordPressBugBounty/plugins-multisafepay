@@ -1,8 +1,8 @@
 <?php return array(
     'root' => array(
         'name' => 'multisafepay/woocommerce',
-        'pretty_version' => '6.6.1',
-        'version' => '6.6.1.0',
+        'pretty_version' => '6.6.2',
+        'version' => '6.6.2.0',
         'reference' => null,
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
@@ -20,8 +20,8 @@
             'dev_requirement' => false,
         ),
         'multisafepay/woocommerce' => array(
-            'pretty_version' => '6.6.1',
-            'version' => '6.6.1.0',
+            'pretty_version' => '6.6.2',
+            'version' => '6.6.2.0',
             'reference' => null,
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
@@ -29,9 +29,9 @@
             'dev_requirement' => false,
         ),
         'nyholm/psr7' => array(
-            'pretty_version' => '1.8.1',
-            'version' => '1.8.1.0',
-            'reference' => 'aa5fc277a4f5508013d571341ade0c3886d4d00e',
+            'pretty_version' => '1.8.2',
+            'version' => '1.8.2.0',
+            'reference' => 'a71f2b11690f4b24d099d6b16690a90ae14fc6f3',
             'type' => 'library',
             'install_path' => __DIR__ . '/../nyholm/psr7',
             'aliases' => array(),
@@ -50,9 +50,9 @@
             ),
         ),
         'php-http/discovery' => array(
-            'pretty_version' => '1.19.4',
-            'version' => '1.19.4.0',
-            'reference' => '0700efda8d7526335132360167315fdab3aeb599',
+            'pretty_version' => '1.20.0',
+            'version' => '1.20.0.0',
+            'reference' => '82fe4c73ef3363caed49ff8dd1539ba06044910d',
             'type' => 'composer-plugin',
             'install_path' => __DIR__ . '/../php-http/discovery',
             'aliases' => array(),
