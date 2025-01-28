@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://camo.githubusercontent.com/517483ae0eaba9884f397e9af1c4adc7bbc231575ac66cc54292e00400edcd10/68747470733a2f2f7777772e6d756c7469736166657061792e636f6d2f66696c6561646d696e2f74656d706c6174652f696d672f6d756c7469736166657061792d6c6f676f2d69636f6e2e737667" width="400px" position="center">
+    <img src="https://raw.githubusercontent.com/MultiSafepay/MultiSafepay-logos/master/MultiSafepay-logo-color.svg" width="400px" position="center">
 </p>
 
 # MultiSafepay PHP SDK
@@ -69,7 +69,8 @@ use MultiSafepay\ValueObject\Customer\Country;
 use MultiSafepay\ValueObject\Customer\Address;
 use MultiSafepay\ValueObject\Customer\PhoneNumber;
 use MultiSafepay\ValueObject\Customer\EmailAddress;
-use MultiSafepay\ValueObject\Money;
+use MultiSafepay\ValueObject\Amount;
+use MultiSafepay\ValueObject\Currency;
 use MultiSafepay\Api\Transactions\OrderRequest\Arguments\CustomerDetails;
 use MultiSafepay\Api\Transactions\OrderRequest\Arguments\PluginDetails;
 use MultiSafepay\Api\Transactions\OrderRequest\Arguments\PaymentOptions;
@@ -81,7 +82,8 @@ $multiSafepaySdk = new \MultiSafepay\Sdk($yourApiKey, $isProduction);
 
 $orderId = (string) time();
 $description = 'Order #' . $orderId;
-$amount = new Money(2000, 'EUR'); // Amount must be in cents!!
+$amount = new Amount(2000); // Amount must be in cents!!
+$currency = new Currency('EUR');
 
 $address = (new Address())
     ->addStreetName('Kraanspoor')
@@ -115,7 +117,8 @@ $orderRequest = (new OrderRequest())
     ->addType('redirect')
     ->addOrderId($orderId)
     ->addDescriptionText($description)
-    ->addMoney($amount)
+    ->addAmount($amount)
+    ->addCurrency($currency)
     ->addGatewayCode('IDEAL')
     ->addCustomer($customer)
     ->addDelivery($customer)
@@ -130,17 +133,19 @@ Example refund:
 ```php
 // Refund example.
 use MultiSafepay\Api\Transactions\RefundRequest;
-use MultiSafepay\ValueObject\Money;
+use MultiSafepay\ValueObject\Amount;
+use MultiSafepay\ValueObject\Currency;
 
 $yourApiKey = 'your-api-key';
 $isProduction = false;
 $multiSafepaySdk = new \MultiSafepay\Sdk($yourApiKey, $isProduction);
 
 $orderId = XXXXX;  // The order ID of a previously completed transaction
-$refundAmount = new Money(2000, 'EUR');
+$refundAmount = new Amount(2000);
+$refundCurrency = new Currency('EUR');
 $transactionManager = $multiSafepaySdk->getTransactionManager();
 $transaction = $transactionManager->get($orderId);
-$transactionManager->refund($transaction, (new RefundRequest())->addMoney( $refundAmount ) );
+$transactionManager->refund($transaction, (new RefundRequest())->addAmount($refundAmount)->addCurrency($refundCurrency));
 ```
 
 For examples of building full requests, see [USAGE.md](USAGE.md) and the functional tests in `tests/Functional/Api/Transactions`.

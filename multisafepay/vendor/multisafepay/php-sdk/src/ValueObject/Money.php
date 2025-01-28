@@ -11,6 +11,8 @@ use MultiSafepay\Util\MoneyFormatter;
 /**
  * Class Money
  * @package MultiSafepay\ValueObject
+ * @deprecated since version 5.15.0, will be removed in version 7.0.0
+ * Replaced by ValueObject\Amount, ValueObject\UnitPrice and ValueObject\Currency
  */
 class Money
 {
@@ -30,6 +32,7 @@ class Money
      * @param float $amount
      * Amount in full units like Euros for CartItem $unitPrice
      * Amount in cents for OrderRequest $money
+     * Amount in cents for UpdateRequest $partialShipmentAmount
      *
      * @param string $currency Currency code, like EUR
      */

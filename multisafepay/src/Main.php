@@ -3,7 +3,6 @@
 namespace MultiSafepay\WooCommerce;
 
 use MultiSafepay\WooCommerce\PaymentMethods\Base\BasePaymentMethodBlocks;
-use MultiSafepay\WooCommerce\PaymentMethods\PaymentMethods;
 use MultiSafepay\WooCommerce\PaymentMethods\PaymentMethodsController;
 use MultiSafepay\WooCommerce\Settings\SettingsController;
 use MultiSafepay\WooCommerce\Settings\ThirdPartyCompatibility;
@@ -143,6 +142,8 @@ class Main {
         $this->loader->add_filter( 'woocommerce_available_payment_gateways', $payment_methods, 'filter_gateway_per_country', 11 );
         // Filter per min amount
         $this->loader->add_filter( 'woocommerce_available_payment_gateways', $payment_methods, 'filter_gateway_per_min_amount', 12 );
+        // Filter per user role
+        $this->loader->add_filter( 'woocommerce_available_payment_gateways', $payment_methods, 'filter_gateway_per_user_roles', 13 );
         // Set MultiSafepay transaction as shipped
         $this->loader->add_action( 'woocommerce_order_status_' . str_replace( 'wc-', '', get_option( 'multisafepay_trigger_transaction_to_shipped', 'wc-completed' ) ), $payment_methods, 'set_multisafepay_transaction_as_shipped', 10, 1 );
         // Set MultiSafepay transaction as invoiced
@@ -169,6 +170,8 @@ class Main {
         // Getting total price update for payment methods
         $this->loader->add_action( 'wp_ajax_get_updated_total_price', $payment_methods, 'get_updated_total_price' );
         $this->loader->add_action( 'wp_ajax_nopriv_get_updated_total_price', $payment_methods, 'get_updated_total_price' );
+        // Add the MultiSafepay transaction link in the order details page
+        $this->loader->add_action( 'woocommerce_admin_order_data_after_payment_info', $payment_methods, 'add_multisafepay_transaction_link' );
         // Register the MultiSafepay payment methods in WooCommerce Blocks.
         add_action( 'woocommerce_blocks_loaded', array( $this, 'register_multisafepay_payment_methods_blocks' ) );
     }
