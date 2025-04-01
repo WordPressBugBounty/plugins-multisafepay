@@ -2,14 +2,16 @@
 
 namespace MultiSafepay\WooCommerce;
 
-use MultiSafepay\WooCommerce\PaymentMethods\Base\BasePaymentMethodBlocks;
+use MultiSafepay\WooCommerce\Blocks\BlocksController;
 use MultiSafepay\WooCommerce\PaymentMethods\PaymentMethodsController;
+use MultiSafepay\WooCommerce\Services\PaymentComponentService;
+use MultiSafepay\WooCommerce\Services\Qr\QrPaymentComponentService;
+use MultiSafepay\WooCommerce\Services\Qr\QrPaymentWebhook;
 use MultiSafepay\WooCommerce\Settings\SettingsController;
 use MultiSafepay\WooCommerce\Settings\ThirdPartyCompatibility;
 use MultiSafepay\WooCommerce\Utils\CustomLinks;
 use MultiSafepay\WooCommerce\Utils\Internationalization;
 use MultiSafepay\WooCommerce\Utils\Loader;
-use MultiSafepay\WooCommerce\Services\PaymentComponentService;
 
 /**
  * This class is the core of the plugin.
@@ -32,27 +34,25 @@ class Main {
      */
     public function __construct() {
         $this->loader = new Loader();
+        $this->compatibilities();
         $this->set_locale();
-        $this->add_custom_links_in_plugin_list();
-        $this->define_settings_hooks();
-        $this->define_payment_methods_hooks();
-        $this->define_compatibilities();
+        $this->custom_links_in_plugin_list();
+        $this->settings_hooks();
+        $this->block_hooks();
+        $this->payment_methods_hooks();
+        $this->payment_components_hooks();
+        $this->payment_components_qr_hooks();
+        $this->callback_hooks();
     }
 
     /**
-     * Register the MultiSafepay payment methods in WooCommerce Blocks.
+     * Define compatibilities with third party plugins
      *
      * @return void
      */
-    public static function register_multisafepay_payment_methods_blocks(): void {
-        if ( class_exists( \Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry::class ) ) {
-            add_action(
-                'woocommerce_blocks_payment_method_type_registration',
-                function ( \Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry ) {
-                    $payment_method_registry->register( new BasePaymentMethodBlocks() );
-                }
-            );
-        }
+    private function compatibilities(): void {
+        $compatibilities = new ThirdPartyCompatibility();
+        $this->loader->add_action( 'before_woocommerce_init', $compatibilities, 'declare_all_compatibilities' );
     }
 
     /**
@@ -76,29 +76,18 @@ class Main {
      *
      * @return  void
      */
-    private function add_custom_links_in_plugin_list(): void {
+    private function custom_links_in_plugin_list(): void {
         $custom_links = new CustomLinks();
         $this->loader->add_filter( 'plugin_action_links_multisafepay/multisafepay.php', $custom_links, 'get_links' );
     }
 
     /**
-     * Define compatibilities with third party plugins
-     *
-     * @return void
-     */
-    private function define_compatibilities(): void {
-        $compatibilities = new ThirdPartyCompatibility();
-        $this->loader->add_action( 'before_woocommerce_init', $compatibilities, 'declare_all_compatibilities' );
-    }
-
-    /**
-     * Register all of the hooks related to the common settings
+     * Register the hooks related to the common settings
      * of the plugin.
      *
      * @return void
      */
-    private function define_settings_hooks(): void {
-        // Settings controller
+    private function settings_hooks(): void {
         $plugin_settings = new SettingsController();
 
         // Filter get_option for some option names.
@@ -124,13 +113,12 @@ class Main {
     }
 
     /**
-     * Register all of the hooks related to the payment methods
+     * Register the hooks related to the payment methods
      * of the plugin.
      *
      * @return void
      */
-    private function define_payment_methods_hooks(): void {
-        // Payment controller
+    private function payment_methods_hooks(): void {
         $payment_methods = new PaymentMethodsController();
         // Enqueue styles in payment methods
         $this->loader->add_action( 'wp_enqueue_scripts', $payment_methods, 'enqueue_styles' );
@@ -160,10 +148,6 @@ class Main {
         $this->loader->add_action( 'rest_api_init', $payment_methods, 'multisafepay_register_rest_route' );
         // Allow cancel orders for on-hold status
         $this->loader->add_filter( 'woocommerce_valid_order_statuses_for_cancel', $payment_methods, 'allow_cancel_multisafepay_orders_with_on_hold_status', 10, 2 );
-        // Allow to refresh the data sent to initialize the Payment Components, when in the checkout, something changed in the order details
-        $payment_component_service = new PaymentComponentService();
-        $this->loader->add_action( 'wp_ajax_get_payment_component_arguments', $payment_component_service, 'ajax_get_payment_component_arguments' );
-        $this->loader->add_action( 'wp_ajax_nopriv_get_payment_component_arguments', $payment_component_service, 'ajax_get_payment_component_arguments' );
         // Ajax related to Apple Pay Direct validation
         $this->loader->add_action( 'wp_ajax_applepay_direct_validation', $payment_methods, 'applepay_direct_validation' );
         $this->loader->add_action( 'wp_ajax_nopriv_applepay_direct_validation', $payment_methods, 'applepay_direct_validation' );
@@ -172,12 +156,60 @@ class Main {
         $this->loader->add_action( 'wp_ajax_nopriv_get_updated_total_price', $payment_methods, 'get_updated_total_price' );
         // Add the MultiSafepay transaction link in the order details page
         $this->loader->add_action( 'woocommerce_admin_order_data_after_payment_info', $payment_methods, 'add_multisafepay_transaction_link' );
-        // Register the MultiSafepay payment methods in WooCommerce Blocks.
-        add_action( 'woocommerce_blocks_loaded', array( $this, 'register_multisafepay_payment_methods_blocks' ) );
     }
 
     /**
-     * Run the loader to execute all of the hooks with WordPress.
+     * Register the hooks related to the MultiSafepay payment component
+     *
+     * @return void
+     */
+    public function payment_components_hooks(): void {
+        $payment_component_service = new PaymentComponentService();
+        // Allow to refresh the data sent to initialize the Payment Components, when in the checkout, something changed in the order details
+        $this->loader->add_action( 'wp_ajax_refresh_payment_component_config', $payment_component_service, 'refresh_payment_component_config' );
+        $this->loader->add_action( 'wp_ajax_nopriv_refresh_payment_component_config', $payment_component_service, 'refresh_payment_component_config' );
+    }
+
+    /**
+     * Register the hooks related to the MultiSafepay payment component with QR
+     *
+     * @return void
+     */
+    public function payment_components_qr_hooks() {
+        $qr_payment_component_service = new QrPaymentComponentService();
+        // Set the MultiSafepay QR code transaction
+        $this->loader->add_action( 'wp_ajax_set_multisafepay_qr_code_transaction', $qr_payment_component_service, 'set_multisafepay_qr_code_transaction' );
+        $this->loader->add_action( 'wp_ajax_nopriv_set_multisafepay_qr_code_transaction', $qr_payment_component_service, 'set_multisafepay_qr_code_transaction' );
+        // Get the redirect URL for the order submitted via Payment Components QR
+        $this->loader->add_action( 'wp_ajax_get_qr_order_redirect_url', $qr_payment_component_service, 'get_qr_order_redirect_url' );
+        $this->loader->add_action( 'wp_ajax_nopriv_get_qr_order_redirect_url', $qr_payment_component_service, 'get_qr_order_redirect_url' );
+    }
+
+    /**
+     * Register the hooks related to the processing of the MultiSafepay payment component with QR webhooks
+     *
+     * @return void
+     */
+    public function callback_hooks() {
+        $qr_payment_webhook = new QrPaymentWebhook();
+        // Handle the balancer after submit a QR order, to know where to redirect the user
+        $this->loader->add_action( 'rest_api_init', $qr_payment_webhook, 'multisafepay_register_rest_route_qr_balancer' );
+        // Handle the webhook request from MultiSafepay for the payment status update for QR orders
+        $this->loader->add_action( 'rest_api_init', $qr_payment_webhook, 'multisafepay_register_rest_route_qr_notification' );
+    }
+
+    /**
+     * Register the MultiSafepay payment methods in WooCommerce Blocks.
+     *
+     * @return void
+     */
+    public function block_hooks(): void {
+        $blocks = new BlocksController();
+        $this->loader->add_action( 'woocommerce_blocks_loaded', $blocks, 'register_multisafepay_payment_methods_blocks' );
+    }
+
+    /**
+     * Run the loader to execute the hooks with WordPress.
      *
      * @return void
      */

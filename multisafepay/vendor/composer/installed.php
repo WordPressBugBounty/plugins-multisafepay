@@ -1,8 +1,8 @@
 <?php return array(
     'root' => array(
         'name' => 'multisafepay/woocommerce',
-        'pretty_version' => '6.7.3',
-        'version' => '6.7.3.0',
+        'pretty_version' => '6.8.0',
+        'version' => '6.8.0.0',
         'reference' => null,
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
@@ -11,17 +11,17 @@
     ),
     'versions' => array(
         'multisafepay/php-sdk' => array(
-            'pretty_version' => '5.15.0',
-            'version' => '5.15.0.0',
-            'reference' => 'fbc72c93ac10adeb3e2b1cd0ad4a7a9fb2acff49',
+            'pretty_version' => '5.16.0',
+            'version' => '5.16.0.0',
+            'reference' => '849f1cf0c5ae23819422db4f78db948fd590c4ec',
             'type' => 'library',
             'install_path' => __DIR__ . '/../multisafepay/php-sdk',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
         'multisafepay/woocommerce' => array(
-            'pretty_version' => '6.7.3',
-            'version' => '6.7.3.0',
+            'pretty_version' => '6.8.0',
+            'version' => '6.8.0.0',
             'reference' => null,
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
