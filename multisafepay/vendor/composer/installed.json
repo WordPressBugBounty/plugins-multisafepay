@@ -2,17 +2,17 @@
     "packages": [
         {
             "name": "multisafepay/php-sdk",
-            "version": "5.16.0",
-            "version_normalized": "5.16.0.0",
+            "version": "5.17.0",
+            "version_normalized": "5.17.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/MultiSafepay/php-sdk.git",
-                "reference": "849f1cf0c5ae23819422db4f78db948fd590c4ec"
+                "reference": "4c46227cf3139d76ff08bc4191f06445c867798b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/MultiSafepay/php-sdk/zipball/849f1cf0c5ae23819422db4f78db948fd590c4ec",
-                "reference": "849f1cf0c5ae23819422db4f78db948fd590c4ec",
+                "url": "https://api.github.com/repos/MultiSafepay/php-sdk/zipball/4c46227cf3139d76ff08bc4191f06445c867798b",
+                "reference": "4c46227cf3139d76ff08bc4191f06445c867798b",
                 "shasum": ""
             },
             "require": {
@@ -37,7 +37,7 @@
             "suggest": {
                 "jschaedl/iban-validation": "Adds additional IBAN validation for \\MultiSafepay\\ValueObject\\IbanNumber"
             },
-            "time": "2025-03-19T15:29:14+00:00",
+            "time": "2025-06-04T13:12:21+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -52,7 +52,7 @@
             "description": "MultiSafepay PHP SDK",
             "support": {
                 "issues": "https://github.com/MultiSafepay/php-sdk/issues",
-                "source": "https://github.com/MultiSafepay/php-sdk/tree/5.16.0"
+                "source": "https://github.com/MultiSafepay/php-sdk/tree/5.17.0"
             },
             "install-path": "../multisafepay/php-sdk"
         },

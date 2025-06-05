@@ -4,6 +4,7 @@ namespace MultiSafepay\WooCommerce\Utils;
 
 use WC_Cart;
 use WC_Shipping_Rate;
+use WC_Validation;
 
 /**
  * Class QrCheckoutManager
@@ -34,7 +35,7 @@ class QrCheckoutManager {
     public $posted_data = array();
 
     /**
-     * Check if all mandatory fields are filled in the checkout in order to submit a MultiSafepay transaction
+     * Check if all mandatory fields are filled in the checkout to submit a MultiSafepay transaction
      * using Payment Component with QR code.
      *
      * @return bool
@@ -50,25 +51,32 @@ class QrCheckoutManager {
         $this->posted_data = $this->get_posted_data();
 
         // Get required and extra fields
-        $required_fields = $this->get_required_fields();
-        $extra_fields    = $this->get_extra_fields();
+        $billing_required_fields = $this->get_required_fields();
+        $billing_extra_fields    = $this->get_extra_fields();
 
         // Determine if shipping to a different address
         $ship_to_different_address = $this->is_shipping_to_different_address( $this->posted_data );
 
         // Get shipping fields if necessary
-        $shipping_fields = $ship_to_different_address ?
-            $this->get_shipping_fields( $required_fields, $extra_fields ) :
-            array();
+        $shipping_fields          = array();
+        $shipping_required_fields = array();
+
+        if ( $ship_to_different_address ) {
+            $shipping_fields          = $this->get_shipping_fields( $billing_required_fields, $billing_extra_fields );
+            $shipping_required_fields = $this->get_shipping_fields( $billing_required_fields, array() );
+        }
 
         // Combine all fields
-        $all_fields = array_merge( $required_fields, $extra_fields, $shipping_fields );
+        $all_fields = array_merge( $billing_required_fields, $billing_extra_fields, $shipping_fields );
+
+        // Combine all required fields
+        $all_required_fields = array_merge( $billing_required_fields, $shipping_required_fields );
 
         // Get order fields
         $order_fields = $this->get_order_fields();
 
         // Process and validate fields
-        $this->process_checkout_data( $all_fields, $required_fields, $order_fields );
+        $this->process_checkout_data( $all_fields, $all_required_fields, $order_fields );
 
         return $this->is_validated;
     }
@@ -352,17 +360,17 @@ class QrCheckoutManager {
     /**
      * Get the shipping fields based on required and extra fields.
      *
-     * @param array $required_fields The required fields.
-     * @param array $extra_fields The extra fields.
+     * @param array $billing_required_fields The required fields.
+     * @param array $billing_extra_fields The extra fields.
      * @return array
      */
-    public function get_shipping_fields( array $required_fields, array $extra_fields ): array {
+    public function get_shipping_fields( array $billing_required_fields, array $billing_extra_fields ): array {
         return array_map(
             static function( $field ) {
                 return str_replace( 'billing_', 'shipping_', $field );
             },
             array_filter(
-                array_merge( $required_fields, $extra_fields ),
+                array_merge( $billing_required_fields, $billing_extra_fields ),
                 static function( $field ) {
                     // Exclude email and phone fields to be created as shipping fields.
                     return ! in_array( $field, array( 'billing_email', 'billing_phone' ), true );
@@ -375,23 +383,42 @@ class QrCheckoutManager {
      * Process customer and order fields from the posted data.
      *
      * @param array $all_fields All fields to check.
-     * @param array $required_fields The required fields.
+     * @param array $all_required_fields The required fields.
      * @param array $order_fields The order fields.
      */
-    public function process_checkout_data( array $all_fields, array $required_fields, array $order_fields ): void {
+    public function process_checkout_data( array $all_fields, array $all_required_fields, array $order_fields ): void {
         $this->is_validated = true;
 
         // Process customer fields (billing and shipping)
         foreach ( $all_fields as $field ) {
             if ( 'billing_email' === $field ) {
                 $field_value = isset( $this->posted_data[ $field ] ) ? sanitize_email( wp_unslash( $this->posted_data[ $field ] ) ) : '';
+
+                // Verify the email format using PHP's built-in filter validation
+                if ( ! empty( $field_value ) && ! $this->validate_email( $field_value ) ) {
+                    $this->is_validated = false;
+                }
+            } elseif ( strpos( $field, '_postcode' ) !== false ) {
+                $field_value = isset( $this->posted_data[ $field ] ) ? wp_unslash( $this->posted_data[ $field ] ) : '';
+                $field_value = trim( wp_strip_all_tags( $field_value ) );
+
+                // Validate a postcode format if not empty
+                if ( ! empty( $field_value ) ) {
+                    $prefix  = strpos( $field, 'billing_' ) === 0 ? 'billing' : 'shipping';
+                    $country = isset( $this->posted_data[ $prefix . '_country' ] ) ? wp_unslash( $this->posted_data[ $prefix . '_country' ] ) : '';
+                    $country = trim( wp_strip_all_tags( $country ) );
+
+                    if ( ! $this->validate_postcode( $field_value, $country ) ) {
+                        $this->is_validated = false;
+                    }
+                }
             } else {
                 $field_value = isset( $this->posted_data[ $field ] ) ? wp_unslash( $this->posted_data[ $field ] ) : '';
                 $field_value = trim( wp_strip_all_tags( $field_value ) );
             }
 
-            // Check if required field is empty
-            if ( empty( $field_value ) && in_array( $field, $required_fields, true ) ) {
+            // Check if the required field is empty
+            if ( empty( $field_value ) && in_array( $field, $all_required_fields, true ) ) {
                 $this->is_validated = false;
             }
 
@@ -452,5 +479,30 @@ class QrCheckoutManager {
                 }
             }
         }
+    }
+
+    /**
+     * Validate the email address format
+     *
+     * @param string $email The email to validate
+     * @return bool Whether the email is valid
+     */
+    private function validate_email( string $email ): bool {
+        return (bool) filter_var( $email, FILTER_VALIDATE_EMAIL );
+    }
+
+    /**
+     * Validate a postcode format using WooCommerce's validation
+     *
+     * @param string $postcode The postcode to validate
+     * @param string $country The country code
+     * @return bool Whether the postcode is valid
+     */
+    private function validate_postcode( string $postcode, string $country ): bool {
+        if ( ! WC_Validation::is_postcode( $postcode, $country ) ) {
+            return false;
+        }
+
+        return true;
     }
 }
