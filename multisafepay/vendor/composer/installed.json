@@ -2,17 +2,17 @@
     "packages": [
         {
             "name": "multisafepay/php-sdk",
-            "version": "5.17.0",
-            "version_normalized": "5.17.0.0",
+            "version": "5.18.0",
+            "version_normalized": "5.18.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/MultiSafepay/php-sdk.git",
-                "reference": "4c46227cf3139d76ff08bc4191f06445c867798b"
+                "reference": "837555d3d4699761ab34387605b192be5421ed63"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/MultiSafepay/php-sdk/zipball/4c46227cf3139d76ff08bc4191f06445c867798b",
-                "reference": "4c46227cf3139d76ff08bc4191f06445c867798b",
+                "url": "https://api.github.com/repos/MultiSafepay/php-sdk/zipball/837555d3d4699761ab34387605b192be5421ed63",
+                "reference": "837555d3d4699761ab34387605b192be5421ed63",
                 "shasum": ""
             },
             "require": {
@@ -37,7 +37,7 @@
             "suggest": {
                 "jschaedl/iban-validation": "Adds additional IBAN validation for \\MultiSafepay\\ValueObject\\IbanNumber"
             },
-            "time": "2025-06-04T13:12:21+00:00",
+            "time": "2025-10-15T10:31:17+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -47,12 +47,12 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "MIT"
+                "OSL-3.0"
             ],
             "description": "MultiSafepay PHP SDK",
             "support": {
                 "issues": "https://github.com/MultiSafepay/php-sdk/issues",
-                "source": "https://github.com/MultiSafepay/php-sdk/tree/5.17.0"
+                "source": "https://github.com/MultiSafepay/php-sdk/tree/5.18.0"
             },
             "install-path": "../multisafepay/php-sdk"
         },
