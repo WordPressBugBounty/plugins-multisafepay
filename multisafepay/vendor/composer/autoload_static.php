@@ -4,52 +4,52 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit431ee68f29f658207118bb5cd3435acb
+class ComposerStaticInit28e45a30c0d551a1bda1a2bce6e79c02
 {
     public static $prefixLengthsPsr4 = array (
-        'P' => 
+        'P' =>
         array (
             'Psr\\Http\\Message\\' => 17,
             'Psr\\Http\\Client\\' => 16,
         ),
-        'N' => 
+        'N' =>
         array (
             'Nyholm\\Psr7\\' => 12,
         ),
-        'M' => 
+        'M' =>
         array (
             'MultiSafepay\\WooCommerce\\' => 25,
             'MultiSafepay\\' => 13,
         ),
-        'H' => 
+        'H' =>
         array (
             'Http\\Discovery\\' => 15,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'Psr\\Http\\Message\\' => 
+        'Psr\\Http\\Message\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/http-factory/src',
             1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
-        'Psr\\Http\\Client\\' => 
+        'Psr\\Http\\Client\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/http-client/src',
         ),
-        'Nyholm\\Psr7\\' => 
+        'Nyholm\\Psr7\\' =>
         array (
             0 => __DIR__ . '/..' . '/nyholm/psr7/src',
         ),
-        'MultiSafepay\\WooCommerce\\' => 
+        'MultiSafepay\\WooCommerce\\' =>
         array (
             0 => __DIR__ . '/../..' . '/src',
         ),
-        'MultiSafepay\\' => 
+        'MultiSafepay\\' =>
         array (
             0 => __DIR__ . '/..' . '/multisafepay/php-sdk/src',
         ),
-        'Http\\Discovery\\' => 
+        'Http\\Discovery\\' =>
         array (
             0 => __DIR__ . '/..' . '/php-http/discovery/src',
         ),
@@ -62,9 +62,9 @@ class ComposerStaticInit431ee68f29f658207118bb5cd3435acb
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit431ee68f29f658207118bb5cd3435acb::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit431ee68f29f658207118bb5cd3435acb::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit431ee68f29f658207118bb5cd3435acb::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit28e45a30c0d551a1bda1a2bce6e79c02::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit28e45a30c0d551a1bda1a2bce6e79c02::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit28e45a30c0d551a1bda1a2bce6e79c02::$classMap;
 
         }, null, ClassLoader::class);
     }

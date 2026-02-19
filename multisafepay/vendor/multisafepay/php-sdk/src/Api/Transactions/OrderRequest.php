@@ -15,6 +15,7 @@ use MultiSafepay\Api\Transactions\OrderRequest\Arguments\CustomInfo;
 use MultiSafepay\Api\Transactions\OrderRequest\Arguments\Description;
 use MultiSafepay\Api\Transactions\OrderRequest\Arguments\GatewayInfoInterface;
 use MultiSafepay\Api\Transactions\OrderRequest\Arguments\GoogleAnalytics;
+use MultiSafepay\Api\Transactions\OrderRequest\Arguments\PaymentData;
 use MultiSafepay\Api\Transactions\OrderRequest\Arguments\PaymentOptions;
 use MultiSafepay\Api\Transactions\OrderRequest\Arguments\PluginDetails;
 use MultiSafepay\Api\Transactions\OrderRequest\Arguments\SecondChance;
@@ -117,6 +118,11 @@ class OrderRequest extends RequestBody implements OrderRequestInterface
     protected $checkoutOptions;
 
     /**
+     * @var PaymentData
+     */
+    protected $paymentData;
+
+    /**
      * @var int
      */
     protected $secondsActive;
@@ -165,6 +171,11 @@ class OrderRequest extends RequestBody implements OrderRequestInterface
      * @var Currency
      */
     private $currency;
+
+    /**
+     * @var string
+     */
+    private $capture;
 
     /**
      * @var ?OrderRequest\Arguments\Affiliate
@@ -451,6 +462,16 @@ class OrderRequest extends RequestBody implements OrderRequestInterface
     }
 
     /**
+     * Retrieve the payment_options object from the OrderRequest
+     *
+     * @return PaymentOptions|null
+     */
+    public function getPaymentOptions(): ?PaymentOptions
+    {
+        return $this->paymentOptions;
+    }
+
+    /**
      * Retrieve the checkout_options object from the OrderRequest
      *
      * @return CheckoutOptions
@@ -491,6 +512,16 @@ class OrderRequest extends RequestBody implements OrderRequestInterface
     public function addCheckoutOptions(CheckoutOptions $checkoutOptions): OrderRequest
     {
         $this->checkoutOptions = $checkoutOptions;
+        return $this;
+    }
+
+    /**
+     * @param PaymentData $paymentData
+     * @return OrderRequest
+     */
+    public function addPaymentData(PaymentData $paymentData): OrderRequest
+    {
+        $this->paymentData = $paymentData;
         return $this;
     }
 
@@ -579,6 +610,16 @@ class OrderRequest extends RequestBody implements OrderRequestInterface
     }
 
     /**
+     * @param string $capture
+     * @return OrderRequest
+     */
+    public function addCapture(string $capture = 'manual'): OrderRequest
+    {
+        $this->capture = $capture;
+        return $this;
+    }
+
+    /**
      * @param ?OrderRequest\Arguments\Affiliate $affiliate
      * @return OrderRequest
      */
@@ -620,6 +661,7 @@ class OrderRequest extends RequestBody implements OrderRequestInterface
             'delivery' => $this->delivery ? $this->delivery->getData() : null,
             'shopping_cart' => $this->shoppingCart ? $this->shoppingCart->getData() : null,
             'checkout_options' => $this->checkoutOptions ? $this->checkoutOptions->getData() : null,
+            'payment_data' => $this->paymentData ? $this->paymentData->getData() : null,
             'days_active' => $this->daysActive,
             'seconds_active' => $this->secondsActive,
             'plugin' => $this->pluginDetails ? $this->pluginDetails->getData() : null,
@@ -627,6 +669,7 @@ class OrderRequest extends RequestBody implements OrderRequestInterface
             'var1' => $this->getVar1(),
             'var2' => $this->getVar2(),
             'var3' => $this->getVar3(),
+            'capture' => $this->capture ?? null,
             'affiliate' => $this->affiliate ? $this->affiliate->getData() : null,
         ];
 

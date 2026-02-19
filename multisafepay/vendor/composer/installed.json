@@ -2,17 +2,17 @@
     "packages": [
         {
             "name": "multisafepay/php-sdk",
-            "version": "5.18.0",
-            "version_normalized": "5.18.0.0",
+            "version": "5.20.0",
+            "version_normalized": "5.20.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/MultiSafepay/php-sdk.git",
-                "reference": "837555d3d4699761ab34387605b192be5421ed63"
+                "reference": "a83adfae608a97f584c8812eb03983d7f8fb2271"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/MultiSafepay/php-sdk/zipball/837555d3d4699761ab34387605b192be5421ed63",
-                "reference": "837555d3d4699761ab34387605b192be5421ed63",
+                "url": "https://api.github.com/repos/MultiSafepay/php-sdk/zipball/a83adfae608a97f584c8812eb03983d7f8fb2271",
+                "reference": "a83adfae608a97f584c8812eb03983d7f8fb2271",
                 "shasum": ""
             },
             "require": {
@@ -32,12 +32,12 @@
                 "php-http/message-factory": "^1.1",
                 "php-http/mock-client": "^1.3",
                 "phpstan/phpstan": "^1.8",
-                "phpunit/phpunit": "^9.0 || ^7.5"
+                "phpunit/phpunit": "^8.5 || ^9.0"
             },
             "suggest": {
                 "jschaedl/iban-validation": "Adds additional IBAN validation for \\MultiSafepay\\ValueObject\\IbanNumber"
             },
-            "time": "2025-10-15T10:31:17+00:00",
+            "time": "2026-02-18T07:51:14+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -52,7 +52,7 @@
             "description": "MultiSafepay PHP SDK",
             "support": {
                 "issues": "https://github.com/MultiSafepay/php-sdk/issues",
-                "source": "https://github.com/MultiSafepay/php-sdk/tree/5.18.0"
+                "source": "https://github.com/MultiSafepay/php-sdk/tree/5.20.0"
             },
             "install-path": "../multisafepay/php-sdk"
         },

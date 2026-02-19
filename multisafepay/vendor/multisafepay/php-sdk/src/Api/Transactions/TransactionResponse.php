@@ -187,6 +187,14 @@ class TransactionResponse extends ResponseBody
     }
 
     /**
+     * @return bool
+     */
+    public function isCompleted(): bool
+    {
+        return $this->getStatus() === Transaction::COMPLETED;
+    }
+
+    /**
      * @return string
      */
     public function getFinancialStatus(): string
@@ -342,12 +350,18 @@ class TransactionResponse extends ResponseBody
     }
 
     /**
-     * @return ShoppingCart
+     * @return ShoppingCart|null
      * @throws InvalidArgumentException
      */
-    public function getShoppingCart(): ShoppingCart
+    public function getShoppingCart(): ?ShoppingCart
     {
-        return ShoppingCart::fromData($this->get('shopping_cart'));
+        $shoppingCartData = $this->get('shopping_cart');
+
+        if (empty($shoppingCartData)) {
+            return null;
+        }
+
+        return ShoppingCart::fromData($shoppingCartData);
     }
 
     /**
