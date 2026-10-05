@@ -2,6 +2,7 @@
 
 namespace MultiSafepay\WooCommerce\Services;
 
+use Exception;
 use MultiSafepay\Api\ApiTokenManager;
 use MultiSafepay\Exception\ApiException;
 use MultiSafepay\WooCommerce\Utils\Logger;
@@ -40,9 +41,8 @@ class ApiTokenService {
     }
 
     /**
-     * Returns a MultiSafepay ApiToken
-     *
      * @return string
+     * @throws \MultiSafepay\Exception\InvalidDataInitializationException
      */
     public function get_api_token(): string {
         if ( null === $this->api_token_manager ) {
@@ -56,7 +56,7 @@ class ApiTokenService {
 
         try {
             $api_token = $this->api_token_manager->get()->getApiToken();
-        } catch ( ApiException | ClientExceptionInterface $exception ) {
+        } catch ( ApiException | ClientExceptionInterface | Exception $exception ) {
             $this->logger->log_error( $exception->getMessage() );
             return '';
         }
